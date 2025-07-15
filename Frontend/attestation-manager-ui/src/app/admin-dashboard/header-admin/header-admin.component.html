@@ -1,0 +1,23 @@
+<div class="admin-header">
+  <div class="logo">
+    <img src="assets/logos/espritLOGO.png" alt="Company Logo">
+  </div>
+  
+  <div class="admin-header__tabs">
+    <ng-container *ngFor="let item of navItems; let i = index">
+<a
+  class="admin-header__tab"
+  [routerLink]="item.path"
+  routerLinkActive="active"
+  [routerLinkActiveOptions]="{ exact: item.exact }"
+  (click)="setActive(i)">
+  {{ item.label }}
+</a>
+
+    </ng-container>
+  </div>
+  
+  <div class="admin-header__nav">
+    <button class="admin-header__logout-btn" (click)="onLogout()">Logout</button>
+  </div>
+</div>

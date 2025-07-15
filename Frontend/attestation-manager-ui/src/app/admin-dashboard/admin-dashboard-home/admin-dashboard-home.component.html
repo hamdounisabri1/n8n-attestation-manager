@@ -1,0 +1,157 @@
+<div class="dashboard-container">
+
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-content">
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">TOTAL ATTESTATIONS</div>
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-change positive">
+          <i class="bi bi-arrow-up"></i> 12% from last week
+        </div>
+      </div>
+
+      <div class="stat-card delivered">
+        <div class="stat-header">DELIVERED</div>
+        <div class="stat-value">{{ stats.delivered }}</div>
+        <div class="stat-change positive">
+          <i class="bi bi-arrow-up"></i> 8% from last week
+        </div>
+      </div>
+
+      <div class="stat-card pending">
+        <div class="stat-header">PENDING</div>
+        <div class="stat-value">{{ stats.pending }}</div>
+        <div class="stat-change negative">
+          <i class="bi bi-arrow-down"></i> 3% from last week
+        </div>
+      </div>
+
+      <div class="stat-card failed">
+        <div class="stat-header">FAILED</div>
+        <div class="stat-value">{{ stats.failed }}</div>
+        <div class="stat-change negative">
+          <i class="bi bi-arrow-down"></i> 1% from last week
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Status Distribution -->
+    <div class="content-card">
+      <h3 class="card-title">Request Status Distribution</h3>
+      
+      <!-- Status Bars Chart -->
+      <div class="status-bars-chart">
+        <div class="status-bar">
+          <div class="status-info">
+            <span class="status-name">Delivered</span>
+            <span class="status-count">{{ stats.delivered }} ({{ getPercentage(stats.delivered, stats.total) }}%)</span>
+          </div>
+          <div class="status-bar-track">
+            <div class="status-bar-fill delivered" [style.width.%]="getPercentage(stats.delivered, stats.total)"></div>
+          </div>
+        </div>
+        
+        <div class="status-bar">
+          <div class="status-info">
+            <span class="status-name">Pending</span>
+            <span class="status-count">{{ stats.pending }} ({{ getPercentage(stats.pending, stats.total) }}%)</span>
+          </div>
+          <div class="status-bar-track">
+            <div class="status-bar-fill pending" [style.width.%]="getPercentage(stats.pending, stats.total)"></div>
+          </div>
+        </div>
+        
+        <div class="status-bar">
+          <div class="status-info">
+            <span class="status-name">Failed</span>
+            <span class="status-count">{{ stats.failed }} ({{ getPercentage(stats.failed, stats.total) }}%)</span>
+          </div>
+          <div class="status-bar-track">
+            <div class="status-bar-fill failed" [style.width.%]="getPercentage(stats.failed, stats.total)"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Processing Efficiency -->
+      <div class="efficiency-container">
+        <div class="efficiency-header">
+          <h4>Processing Efficiency</h4>
+          <div class="success-rate">
+            <span>Success Rate</span>
+            <span class="rate-value">{{ getPercentage(stats.delivered, stats.total) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- n8n Recent Executions Table -->
+    <div class="content-card">
+      <div class="executions-header">
+        <h3 class="card-title">Recent Executions ({{ executions.length }})</h3>
+        <button class="btn btn-outline-primary btn-sm" (click)="refreshExecutions()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+      </div>
+      
+      <div class="executions-table-container">
+        <table class="executions-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Workflow</th>
+              <th>Started</th>
+              <th>Duration</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let execution of executions; trackBy: trackByExecutionId" class="execution-row">
+              <td>
+                <div class="execution-status">
+                  <span class="status-badge" [ngClass]="getStatusBadgeClass(execution.status)">
+                    {{ execution.status }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="workflow-info">
+                  <div class="workflow-name">{{ execution.workflowName || 'Unknown Workflow' }}</div>
+                  <div class="workflow-id">ID: {{ execution.workflowId }}</div>
+                </div>
+              </td>
+              <td class="execution-time">{{ formatDate(execution.startedAt) }}</td>
+              <td class="execution-duration">{{ formatDuration(execution.startedAt, execution.stoppedAt) }}</td>
+              <td>
+                <button 
+                  class="btn btn-link btn-sm execution-action"
+                  (click)="viewExecutionDetails(execution)"
+                  title="View Details"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Empty State -->
+        <div *ngIf="executions.length === 0" class="empty-state">
+          <div class="empty-state-icon">
+            <i class="bi bi-inbox"></i>
+          </div>
+          <div class="empty-state-text">
+            <h4>No executions found</h4>
+            <p>There are no recent workflow executions to display.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br><br><br><br><br>
+</div>
+
+
+<br><br><br><br><br>

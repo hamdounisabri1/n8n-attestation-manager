@@ -33,6 +33,18 @@ export class AuthService {
         catchError(this.handleError)
       );
   }
+    getUserRole(): string | null {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+
+    // JWT is base64 encoded: header.payload.signature
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role || null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An error occurred';

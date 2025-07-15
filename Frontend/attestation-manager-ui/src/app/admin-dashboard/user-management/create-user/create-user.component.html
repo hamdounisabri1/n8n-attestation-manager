@@ -1,0 +1,60 @@
+<div class="manage-users-wrapper"> 
+  <div class="manage-users-main-content"> 
+
+    <!-- Flex container with fixed width for form and error card on right -->
+    <div class="form-error-container">
+      
+      <!-- Form Card -->
+      <div class="content-card">
+        <h1 class="page-title">Create New User</h1>
+        <p class="info-text">
+          Please fill in the details below to create a new user account.
+        </p>
+
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+          <label for="username">Username</label>
+          <input id="username" type="text" placeholder="Enter username" formControlName="username" />
+
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Enter password" formControlName="password" />
+
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="Enter email" formControlName="email" />
+
+          <label for="role">Role</label>
+          <select id="role" formControlName="role">
+            <option value="">Select role</option>
+            <option value="admin">Admin</option>
+            <option value="staff">Staff</option>
+          </select>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            [disabled]="userForm.invalid"
+            [class.disabled]="userForm.invalid"
+          >
+            Create User
+          </button>
+        </form>
+      </div>
+
+      <!-- Error Card (Right Side) -->
+      <div class="error-card" *ngIf="showErrors && userForm.invalid">
+        <h3>Please Review the Form</h3>
+        <ul>
+          <li *ngIf="userForm.get('username')?.errors?.['required']">Username is required.</li>
+          <li *ngIf="userForm.get('password')?.errors?.['required']">Password is required.</li>
+          <li *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters.</li>
+          <li *ngIf="userForm.get('email')?.errors?.['required']">Email is required.</li>
+          <li *ngIf="userForm.get('email')?.errors?.['email']">Invalid email format.</li>
+          <li *ngIf="userForm.get('role')?.errors?.['required']">Role selection is required.</li>
+          <li *ngIf="userForm.get('username')?.errors?.['pattern']">Username must use letters only, with "." or "_" allowed only in the middle.</li>
+
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</div>

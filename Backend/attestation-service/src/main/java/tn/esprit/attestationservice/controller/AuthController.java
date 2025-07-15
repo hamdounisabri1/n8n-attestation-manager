@@ -53,20 +53,27 @@ public class AuthController {
             }
 
             // 2️⃣ Attempt authentication
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                );
+            } catch (BadCredentialsException ex) {
+                // Wrong password case
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid password"));
+            }
 
-            // 3️⃣ If successful, generate token
+            // 3️⃣ If successful, generate token with role
             final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-            final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            final String jwt = jwtUtil.generateToken(userDetails.getUsername(), user.getRole().name()); // Pass role
             return ResponseEntity.ok(new AuthResponse(jwt));
 
-        } catch (BadCredentialsException ex) {
-            // Wrong password case
+        } catch (Exception ex) {
+            // Other errors
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid password"));
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Authentication failed"));
         }
     }
 

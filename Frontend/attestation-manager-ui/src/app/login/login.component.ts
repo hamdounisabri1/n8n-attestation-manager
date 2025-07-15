@@ -36,16 +36,20 @@ export class LoginComponent {
     };
 
     this.authService.login(credentials).subscribe({
-      next: (response) => {
+      next: () => {
         this.loading = false;
-        this.router.navigate(['admin']);
-        console.log('Login successful:', response);
+        const role = this.authService.getUserRole();
+        if (role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else if (role === 'STAFF') {
+          this.router.navigate(['/staff']);
+        } else {
+          this.router.navigate(['/login']); // fallback
+        }
       },
       error: (error) => {
         this.loading = false;
         this.errorMessage = error;
-        this.shakeForm = true;
-        setTimeout(() => this.shakeForm = false, 500);
       }
     });
   }

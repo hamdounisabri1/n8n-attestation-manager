@@ -1,0 +1,145 @@
+/* Ensure full height for html and body */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Wrapper with sidebar on left */
+.manage-users-wrapper {
+  display: flex;
+}
+
+/* Main content takes 80% width with left margin */
+.manage-users-main-content {
+  margin-left: 20%; /* sidebar width */
+  height: calc(100vh - 80px); /* adjust 80px if header height differs */
+  overflow: hidden;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card fills full height */
+.content-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+/* Header: title left, search right */
+.executions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Title styling */
+.card-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+/* Search input styling */
+.search-input {
+  max-width: 260px;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Scrollable container for table body */
+.table-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+/* Scrollbar styling for modern browsers */
+.table-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Table styles */
+.executions-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.executions-table th,
+.executions-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #fff;
+}
+
+/* Sticky table header */
+.executions-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* Hover effect on action icons */
+.bi-eye:hover,
+.bi-trash:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+  transition: 0.2s ease;
+}
+
+/* Empty state styles */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6c757d;
+}
+
+.empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #adb5bd;
+}
+
+.empty-state-text h4 {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
