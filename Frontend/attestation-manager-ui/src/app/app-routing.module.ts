@@ -11,6 +11,9 @@ import { AdminDashboardHomeComponent } from './admin-dashboard/admin-dashboard-h
 import { CreateUserComponent } from './admin-dashboard/user-management/create-user/create-user.component';
 import { ManageUsersComponent } from './admin-dashboard/user-management/manage-users/manage-users.component';
 import { PasswordResetRequestComponent } from './admin-dashboard/user-management/password-reset-request/password-reset-request.component';
+import { AttestationsComponent } from './admin-dashboard/attestation-management/attestations/attestations.component';
+import { ListStudentsComponent } from './admin-dashboard/attestation-management/list-students/list-students.component';
+import { CreateStudentsComponent } from './admin-dashboard/attestation-management/create-students/create-students.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -36,7 +39,14 @@ const routes: Routes = [
           { path: 'change-passwords', component: PasswordResetRequestComponent }
         ]
       },
-      { path: 'attestations', component: AttestationManagementComponent },
+      { path: 'attestations', component: AttestationManagementComponent,
+        children: [
+          { path: '', redirectTo: 'ListStudents', pathMatch: 'full' },
+          { path: 'listAttestations', component: AttestationsComponent },
+          { path: 'ListStudents', component: ListStudentsComponent },
+          { path: 'AddStudent', component: CreateStudentsComponent },
+        ]
+       },
       { path: 'dashboard', component: AdminDashboardHomeComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

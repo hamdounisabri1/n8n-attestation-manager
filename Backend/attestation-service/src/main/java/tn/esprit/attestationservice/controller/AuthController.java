@@ -80,20 +80,17 @@ public class AuthController {
 
     // 📝 Signup endpoint
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody AuthRequest request) {
+    public ResponseEntity<String> signup(@RequestBody AppUser appUser) {
         // Check if username already exists
-        if (userRepository.findByUsername(request.getUsername()) != null) {
+        if (userRepository.findByUsername(appUser.getUsername()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Username already exists.");
         }
-
         // Create and save user
-        AppUser newUser = new AppUser();
-        newUser.setUsername(request.getUsername());
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setRole(Roles.STAFF);
+        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
+        appUser.setRole(Roles.STAFF);
 
-        userRepository.save(newUser);
+        userRepository.save(appUser);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("User registered successfully.");

@@ -16,7 +16,7 @@ public class StudentController {
     private IStudentService studentService;
 
     @PostMapping("create")
-    public Student createPayment(@RequestBody Student student) {
+    public Student createStudent(@RequestBody Student student) {
         return studentService.addStudent(student);
     }
 }

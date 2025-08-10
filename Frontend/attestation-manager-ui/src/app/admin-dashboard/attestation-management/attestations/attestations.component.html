@@ -1,0 +1,79 @@
+<div class="manage-attestations-wrapper">
+  <div class="manage-attestations-main-content">
+    <div class="content-card">
+      <div class="executions-header">
+        <h2 class="card-title">Manage Attestations</h2>
+        <input
+          type="text"
+          class="form-control search-input"
+          placeholder="🔍 Search by name or ID"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+
+      <div class="table-scroll-container">
+        <table class="table table-hover executions-table mb-0">
+          <thead class="table-header">
+            <tr>
+              <th>ID</th>
+              <th>Student Name</th>
+              <th>Student ID</th>
+              <th>Student Class</th>
+              <th>Status</th>
+              <th>Request Date</th>
+              <th>Delivery Date</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let attestation of filteredAttestations">
+              <td>{{ attestation.id }}</td>
+              <td>{{ attestation.studentName }}</td>
+              <td>{{ attestation.studentId }}</td>
+              <td>{{ attestation.studentClass }}</td>
+              <td>
+                <span [ngClass]="{
+                  'status-badge': true,
+                  'status-delivered': attestation.status === 'Delivered',
+                  'status-pending': attestation.status === 'Pending'
+                }">
+                  {{ attestation.status }}
+                </span>
+              </td>
+              <td>{{ attestation.requestDate }}</td>
+              <td>{{ attestation.delivreDate }}</td>
+              <td class="text-end">
+                <i
+                  class="bi bi-eye text-primary me-3"
+                  title="View"
+                  style="cursor: pointer"
+                  (click)="onView(attestation)"
+                ></i>
+                <i
+                  class="bi bi-printer text-success me-3"
+                  title="Print"
+                  style="cursor: pointer"
+                  (click)="onPrint(attestation)"
+                ></i>
+                <i
+                  class="bi bi-trash text-danger"
+                  title="Delete"
+                  style="cursor: pointer"
+                  (click)="onDelete(attestation)"
+                ></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="filteredAttestations.length === 0" class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+        <div class="empty-state-text">
+          <h4>No attestations found</h4>
+          <p>Try a different search term.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

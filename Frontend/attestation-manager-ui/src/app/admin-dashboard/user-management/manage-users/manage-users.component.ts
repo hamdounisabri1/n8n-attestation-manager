@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
+import { UserService } from 'src/app/services/user.service';
 
 
-interface User {
-  id: number;
+export interface User {
+  id?: number;
   username: string;
+  password: string;
   email: string;
   role: string;
-  createdAt: string;
+  createdAt?: string;
 }
 @Component({
   selector: 'app-manage-users',
@@ -15,26 +17,21 @@ interface User {
 })
 export class ManageUsersComponent {
  searchTerm = '';
+ users: User[] = [];
 
-  users: User[] = [
-    { id: 1, username: 'john.doe', email: 'john@example.com', role: 'Admin', createdAt: '2024-12-01' },
-    { id: 2, username: 'jane.smith', email: 'jane@example.com', role: 'Staff', createdAt: '2025-01-15' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    { id: 3, username: 'ahmed.ben', email: 'ahmed@example.com', role: 'Staff', createdAt: '2025-04-08' },
-    // Add more sample users here
-  ];
+  constructor(private userService: UserService) {}
+
+  ngOnInit() {
+    this.loadUsers();
+  }
+
+  // Fetch users from backend
+  loadUsers() {
+    this.userService.getAllUsers().subscribe({
+      next: (users) => this.users = users,
+      error: (err) => console.error('Failed to load users', err)
+    });
+  }
 
   get filteredUsers() {
     return this.users.filter(user =>
@@ -47,9 +44,17 @@ export class ManageUsersComponent {
     // Add navigation or modal logic here
   }
 
+  // Use backend to delete user
   onDelete(user: User) {
     if (confirm(`Are you sure you want to delete ${user.username}?`)) {
-      this.users = this.users.filter(u => u.id !== user.id);
+      this.userService.deleteUser(user.id!).subscribe({
+        next: () => {
+          // Remove user locally after successful deletion
+          this.users = this.users.filter(u => u.id !== user.id);
+              this.loadUsers();
+        },
+        error: (err) => console.error('Failed to delete user', err)
+      });
     }
   }
 }

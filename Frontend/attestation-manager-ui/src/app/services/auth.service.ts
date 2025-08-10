@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { User } from '../admin-dashboard/user-management/manage-users/manage-users.component';
 
 export interface AuthRequest {
   username: string;
@@ -32,6 +33,9 @@ export class AuthService {
         }),
         catchError(this.handleError)
       );
+  }
+    signup(user: User): Observable<string> {
+    return this.http.post(this.API_URL + '/signup', user, { responseType: 'text' });
   }
     getUserRole(): string | null {
     const token = localStorage.getItem('token');

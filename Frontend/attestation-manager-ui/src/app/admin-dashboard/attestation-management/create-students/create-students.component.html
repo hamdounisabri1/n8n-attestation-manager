@@ -1,0 +1,143 @@
+<div class="manage-students-wrapper">
+  <div class="manage-students-main-content">
+    <div class="content-container">
+      <!-- Manual Entry Form Card -->
+      <div class="content-card form-card">
+        <h1 class="page-title">Create New Student</h1>
+        <p class="info-text">
+          Please fill in the student details below or use the file import option.
+        </p>
+
+        <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
+          <div class="form-field">
+            <label for="studentName">Student Name</label>
+            <input 
+              id="studentName" 
+              type="text" 
+              placeholder="Enter full name (e.g., John Smith)" 
+              formControlName="studentName"
+              [class.invalid]="studentForm.get('studentName')?.invalid && 
+                             studentForm.get('studentName')?.touched"
+            />
+            <span class="error-message" 
+                  *ngIf="studentForm.get('studentName')?.invalid && 
+                        studentForm.get('studentName')?.touched">
+              <ng-container *ngIf="studentForm.get('studentName')?.errors?.['required']">
+                Name is required
+              </ng-container>
+              <ng-container *ngIf="studentForm.get('studentName')?.errors?.['pattern']">
+                Name must contain at least two words with letters only
+              </ng-container>
+            </span>
+          </div>
+
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input 
+              id="email" 
+              type="email" 
+              placeholder="Enter email address" 
+              formControlName="email"
+              [class.invalid]="studentForm.get('email')?.invalid && 
+                             studentForm.get('email')?.touched"
+            />
+            <span class="error-message" 
+                  *ngIf="studentForm.get('email')?.invalid && 
+                        studentForm.get('email')?.touched">
+              <ng-container *ngIf="studentForm.get('email')?.errors?.['required']">
+                Email is required
+              </ng-container>
+              <ng-container *ngIf="studentForm.get('email')?.errors?.['email']">
+                Invalid email format
+              </ng-container>
+            </span>
+          </div>
+
+          <div class="form-field">
+            <label for="class">Class</label>
+            <input 
+              id="class" 
+              type="text" 
+              placeholder="Enter class (e.g., 4ARCTIC11)" 
+              formControlName="class"
+              [class.invalid]="studentForm.get('class')?.invalid && 
+                             studentForm.get('class')?.touched"
+            />
+            <span class="error-message" 
+                  *ngIf="studentForm.get('class')?.invalid && 
+                        studentForm.get('class')?.touched">
+              <ng-container *ngIf="studentForm.get('class')?.errors?.['required']">
+                Class is required
+              </ng-container>
+              <ng-container *ngIf="studentForm.get('class')?.errors?.['pattern']">
+                Class format should be like "4ARCTIC11" (1-5 + A/B/ARCTIC + 1-100)
+              </ng-container>
+            </span>
+          </div>
+
+          <div class="form-field">
+            <label for="studentId">Student ID</label>
+            <input 
+              id="studentId" 
+              type="text" 
+              placeholder="Enter ID (e.g., 233amt0415)" 
+              formControlName="studentId"
+              [class.invalid]="studentForm.get('studentId')?.invalid && 
+                             studentForm.get('studentId')?.touched"
+            />
+            <span class="error-message" 
+                  *ngIf="studentForm.get('studentId')?.invalid && 
+                        studentForm.get('studentId')?.touched">
+              <ng-container *ngIf="studentForm.get('studentId')?.errors?.['required']">
+                Student ID is required
+              </ng-container>
+              <ng-container *ngIf="studentForm.get('studentId')?.errors?.['pattern']">
+                Student ID must be 10 characters: 3 numbers + 3 letters + 4 numbers
+              </ng-container>
+            </span>
+          </div>
+
+          <button 
+            type="submit" 
+            [disabled]="studentForm.invalid"
+            [class.disabled]="studentForm.invalid"
+          >
+            Create Student
+          </button>
+        </form>
+      </div>
+
+      <!-- File Import Card -->
+      <div class="content-card import-card">
+        <h2 class="import-title">Import Students</h2>
+        <p class="info-text">
+          Upload an Excel file containing student records.
+        </p>
+
+        <div class="file-upload-container">
+          <div class="file-drop-zone" (click)="fileInput.click()">
+            <input 
+              #fileInput
+              type="file" 
+              (change)="onFileSelected($event)"
+              accept=".xlsx,.xls"
+              style="display: none;"
+            />
+            <i class="bi bi-cloud-upload"></i>
+            <p>Click to select or drag & drop Excel file</p>
+            <span *ngIf="selectedFile">Selected: {{ selectedFile.name }}</span>
+          </div>
+
+          <button 
+            class="upload-button"
+            [disabled]="!selectedFile"
+            [class.disabled]="!selectedFile"
+            (click)="onFileUpload()"
+          >
+            <i class="bi bi-upload"></i> Upload File
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

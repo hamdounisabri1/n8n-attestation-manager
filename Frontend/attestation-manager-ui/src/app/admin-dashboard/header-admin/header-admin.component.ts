@@ -12,7 +12,7 @@ export class HeaderAdminComponent {
 navItems = [
   { label: 'Dashboard', path: '/admin/dashboard', exact: true },
   { label: 'User Management', path: '/admin/users', exact: false },
-  { label: 'Attestation Management', path: '/admin/attestations', exact: true }
+  { label: 'Attestation Management', path: '/admin/attestations', exact: false }
 ];
 
   // Simulate active tab (in real app, bind to router)
