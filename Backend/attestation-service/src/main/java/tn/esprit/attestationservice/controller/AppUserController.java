@@ -21,6 +21,10 @@ public class AppUserController {
         List<AppUser> users = appUserService.getAllUsers();
         return ResponseEntity.ok(users);
     }
+    @GetMapping("/{id}")
+    public AppUser getUser(@PathVariable Long id) {
+        return appUserService.getUserById(id);
+    }
 
     // Delete a user by ID
     @DeleteMapping("/delete/{id}")

@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -16,7 +18,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppUser {
+public class AppUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +28,9 @@ public class AppUser {
     private String password;
     private String email;
     private Roles role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ChangePassRequest> changePasswordRequests;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

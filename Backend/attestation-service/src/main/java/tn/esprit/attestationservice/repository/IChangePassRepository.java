@@ -1,9 +1,7 @@
 package tn.esprit.attestationservice.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tn.esprit.attestationservice.entity.AppUser;
 import tn.esprit.attestationservice.entity.ChangePassRequest;
 
-public interface IUserRepository extends JpaRepository<AppUser, Long> {
-    AppUser findByUsername(String username);
+public interface IChangePassRepository extends JpaRepository<ChangePassRequest, Long> {
 }

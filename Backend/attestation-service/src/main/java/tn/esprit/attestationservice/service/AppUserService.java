@@ -17,7 +17,10 @@ public class AppUserService implements IAppUserService {
     public List<AppUser> getAllUsers() {
         return appUserRepository.findAll();
     }
-
+    public AppUser getUserById(Long id) {
+        return appUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
     @Override
     public String deleteUser(Long id) {
         if (appUserRepository.existsById(id)) {

@@ -66,7 +66,7 @@ public class AuthController {
 
             // 3️⃣ If successful, generate token with role
             final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-            final String jwt = jwtUtil.generateToken(userDetails.getUsername(), user.getRole().name()); // Pass role
+            final String jwt = jwtUtil.generateToken(userDetails.getUsername(), user.getRole().name(),user.getId()); // Pass role
             return ResponseEntity.ok(new AuthResponse(jwt));
 
         } catch (Exception ex) {
