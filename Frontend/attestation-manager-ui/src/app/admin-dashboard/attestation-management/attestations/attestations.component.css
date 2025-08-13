@@ -162,3 +162,7 @@ html, body {
   background-color: #fff3cd;
   color: #856404;
 }
+.status-printed {
+  background-color: #d1ecf1; /* light blue background */
+  color: #0c5460; /* dark blue text */
+}

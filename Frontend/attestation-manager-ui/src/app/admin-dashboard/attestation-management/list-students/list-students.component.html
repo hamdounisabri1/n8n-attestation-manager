@@ -27,9 +27,9 @@
           <tbody>
             <tr *ngFor="let student of filteredStudents">
               <td>{{ student.id }}</td>
-              <td class="text-truncate" [title]="student.name">{{ student.name }}</td>
+              <td class="text-truncate" [title]="student.fullName">{{ student.fullName }}</td>
               <td class="text-truncate" [title]="student.email">{{ student.email }}</td>
-              <td class="text-truncate" [title]="student.class">{{ student.class }}</td>
+              <td class="text-truncate" [title]="student.studentClass">{{ student.studentClass }}</td>
               <td>{{ student.studentId }}</td>
               <td>
                 <span [ngClass]="{

@@ -1,64 +1,86 @@
-import { Component } from '@angular/core';
-interface Attestation {
+import { Component, OnInit } from '@angular/core';
+import { Student } from '../list-students/list-students.component';
+import { HttpClient } from '@angular/common/http';
+export interface Attestation {
   id: number;
-  studentName: string;
-  studentId: string;
-  studentClass: string;
-  status: string;
+  refCode: string;
+  status : AttestationStatus;
   requestDate: string;
   delivreDate: string;
+  student : Student
+}
+export enum AttestationStatus {
+  PENDING = 'PENDING',
+  DELIVERED = 'DELIVERED',
+  PRINTED = 'PRINTED'
 }
 @Component({
   selector: 'app-attestations',
   templateUrl: './attestations.component.html',
   styleUrls: ['./attestations.component.css']
 })
-export class AttestationsComponent {
+export class AttestationsComponent implements OnInit {
   searchTerm = '';
+  attestations: Attestation[] = [];
+  AttestationStatus = AttestationStatus; // expose enum to HTML
 
-  attestations: Attestation[] = [
-    { 
-      id: 1, 
-      studentName: 'John Doe', 
-      studentId: 'STD001', 
-      studentClass: 'Class A',
-      status: 'Delivered',
-      requestDate: '2025-01-15',
-      delivreDate: '2025-01-20'
-    },
-    { 
-      id: 2, 
-      studentName: 'Jane Smith', 
-      studentId: 'STD002', 
-      studentClass: 'Class B',
-      status: 'Pending',
-      requestDate: '2025-01-18',
-      delivreDate: '-'
-    },
-    // Add more sample attestations here
-  ];
+  private apiUrl = 'http://localhost:9090/api/attestations/all';
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.loadAttestations();
+  }
+
+  loadAttestations() {
+    this.http.get<Attestation[]>(this.apiUrl).subscribe({
+      next: (data) => {
+        this.attestations = data;
+      },
+      error: (err) => {
+        console.error('Error fetching attestations', err);
+      },
+    });
+  }
 
   get filteredAttestations() {
-    return this.attestations.filter(attestation =>
-      attestation.studentName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      attestation.studentId.toLowerCase().includes(this.searchTerm.toLowerCase())
+    return this.attestations.filter(
+      (attestation) =>
+        attestation.student.fullName
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        attestation.student.studentId
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
     );
   }
 
-  onView(attestation: Attestation) {
-    alert(`View attestation for ${attestation.studentName}`);
-    // Add navigation or modal logic here
-  }
+
 
   onDelete(attestation: Attestation) {
-    if (confirm(`Are you sure you want to delete attestation for ${attestation.studentName}?`)) {
-      this.attestations = this.attestations.filter(a => a.id !== attestation.id);
+    if (
+      confirm(
+        `Are you sure you want to delete attestation for ${attestation.student.fullName}?`
+      )
+    ) {
+      this.http
+        .delete(`http://localhost:9090/api/attestations/${attestation.id}`, {
+          responseType: 'text',
+        })
+        .subscribe({
+          next: (response) => {
+            alert(response);
+            this.loadAttestations(); // reload after delete
+          },
+          error: (err) => {
+            console.error('Delete failed', err);
+          },
+        });
     }
   }
 
   onPrint(attestation: Attestation) {
-    alert(`Print attestation for ${attestation.studentName}`);
-    // Add print logic here
+    alert(`Print attestation for ${attestation.student.fullName} And id ${attestation.id}`);
   }
 
 }

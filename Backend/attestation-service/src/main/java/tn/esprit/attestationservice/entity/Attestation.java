@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,25 +17,28 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangePassRequest implements Serializable {
-
+public class Attestation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private ChangePassRequestStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "changePasswordRequests"})
-    private AppUser user;
-
+    private String refCode;
+    private AttestationStatus status;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date requestDate;
-    @UpdateTimestamp
+
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date updateDate;
+    private Date deliveryDate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    //@JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnoreProperties({"attestations", "hibernateLazyInitializer", "handler"})
+    private Student student;
+
+
 
 }

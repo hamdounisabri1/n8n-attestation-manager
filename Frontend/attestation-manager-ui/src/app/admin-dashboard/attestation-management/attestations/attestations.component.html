@@ -28,14 +28,15 @@
           <tbody>
             <tr *ngFor="let attestation of filteredAttestations">
               <td>{{ attestation.id }}</td>
-              <td>{{ attestation.studentName }}</td>
-              <td>{{ attestation.studentId }}</td>
-              <td>{{ attestation.studentClass }}</td>
+              <td>{{ attestation.student.fullName }}</td>
+              <td>{{ attestation.student.studentId }}</td>
+              <td>{{ attestation.student.studentClass }}</td>
               <td>
                 <span [ngClass]="{
                   'status-badge': true,
-                  'status-delivered': attestation.status === 'Delivered',
-                  'status-pending': attestation.status === 'Pending'
+                  'status-delivered': attestation.status === AttestationStatus.DELIVERED,
+                  'status-pending': attestation.status === AttestationStatus.PENDING,
+                  'status-printed': attestation.status === AttestationStatus.PRINTED
                 }">
                   {{ attestation.status }}
                 </span>
@@ -43,18 +44,13 @@
               <td>{{ attestation.requestDate }}</td>
               <td>{{ attestation.delivreDate }}</td>
               <td class="text-end">
-                <i
-                  class="bi bi-eye text-primary me-3"
-                  title="View"
+               <i
+                 *ngIf="attestation.status === AttestationStatus.PENDING"
+                class="bi bi-printer text-success me-3"
+                 title="Print"
                   style="cursor: pointer"
-                  (click)="onView(attestation)"
-                ></i>
-                <i
-                  class="bi bi-printer text-success me-3"
-                  title="Print"
-                  style="cursor: pointer"
-                  (click)="onPrint(attestation)"
-                ></i>
+                 (click)="onPrint(attestation)"
+                 ></i>
                 <i
                   class="bi bi-trash text-danger"
                   title="Delete"

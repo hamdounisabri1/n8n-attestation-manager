@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
+import { Attestation } from '../attestations/attestations.component';
 
-interface Student {
+export interface Student {
   id: number;
-  name: string;
+  fullName: string;
   email: string;
-  class: string;
+  studentClass: string;
   studentId: string;
   attestationsCount: number;
+  attestations: Attestation[];
 }
 
 @Component({
@@ -20,48 +22,25 @@ export class ListStudentsComponent {
   currentDate = new Date('2025-08-10T17:12:24Z');
 
   students: Student[] = [
-    { 
-      id: 1, 
-      name: 'John Doe', 
-      email: 'john.doe@example.com',
-      class: 'Class A',
-      studentId: 'STD001',
-      attestationsCount: 3
-    },
-    { 
-      id: 2, 
-      name: 'Jane Smith', 
-      email: 'jane.smith@example.com',
-      class: 'Class B',
-      studentId: 'STD002',
-      attestationsCount: 1
-    },
-    { 
-      id: 3, 
-      name: 'Ahmed Ben', 
-      email: 'ahmed.ben@example.com',
-      class: 'Class A',
-      studentId: 'STD003',
-      attestationsCount: 0
-    },
+
     // Add more sample students here
   ];
 
   get filteredStudents() {
     return this.students.filter(student =>
-      student.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      student.fullName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       student.studentId.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
   onView(student: Student) {
-    alert(`View student details for ${student.name}`);
+    alert(`View student details for ${student.fullName}`);
     // Add navigation or modal logic here
   }
 
   onDelete(student: Student) {
-    if (confirm(`Are you sure you want to delete student ${student.name}?`)) {
+    if (confirm(`Are you sure you want to delete student ${student.fullName}?`)) {
       this.students = this.students.filter(s => s.id !== student.id);
     }
   }
