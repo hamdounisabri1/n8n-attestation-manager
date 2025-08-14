@@ -70,7 +70,7 @@
 }
 
 .stat-card.failed {
-  border-left: 4px solid var(--primary-red);
+  border-left: 4px solid var(--primary-blue);
 }
 
 .stat-header {
@@ -176,9 +176,9 @@
   background-image: linear-gradient(to right, #ffc107, #f0ad4e);
 }
 
-.status-bar-fill.failed {
+.status-bar-fill.printed {
   background-color: var(--primary-red);
-  background-image: linear-gradient(to right, #dc3545, #c82333);
+  background-image: linear-gradient(to right, #0d6efd, #0b5ed7);
 }
 
 @keyframes barFill {

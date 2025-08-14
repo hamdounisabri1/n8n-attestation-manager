@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { AttestationService } from 'src/app/services/attestation.service';
+import { Attestation, AttestationStatus } from '../attestation-management/attestations/attestations.component';
 
 interface AttestationStats {
   total: number;
   delivered: number;
   pending: number;
-  failed: number;
+  printed: number;
 }
 
 interface Execution {
@@ -15,6 +17,7 @@ interface Execution {
   startedAt: Date;
   stoppedAt?: Date;
 }
+
 @Component({
   selector: 'app-admin-dashboard-home',
   templateUrl: './admin-dashboard-home.component.html',
@@ -22,27 +25,35 @@ interface Execution {
 })
 export class AdminDashboardHomeComponent implements OnInit {
   stats: AttestationStats = {
-    total: 5000,
-    delivered: 2000,
-    pending: 2950,
-    failed: 50
+    total: 0,
+    delivered: 0,
+    pending: 0,
+    printed: 0
   };
 
-  constructor() { }
+  executions: Execution[] = [];
+
+  constructor(private attestationService: AttestationService) {}
 
   ngOnInit(): void {
     this.loadAttestationData();
-        this.loadExecutions(); // Load fake/mock data for now
-
+    this.loadExecutions(); // Will still be mock until backend ready
   }
 
   loadAttestationData(): void {
-    // TODO: Replace with actual API call
-    console.log('Loading attestation data...');
-    // Simulate API delay
-    setTimeout(() => {
-      console.log('Data loaded');
-    }, 1000);
+    this.attestationService.getAllAttestations().subscribe({
+      next: (attestations: Attestation[]) => {
+        const total = attestations.length;
+        const delivered = attestations.filter(a => a.status === AttestationStatus.DELIVERED).length;
+        const pending = attestations.filter(a => a.status === AttestationStatus.PENDING).length;
+        const printed = attestations.filter(a => a.status === AttestationStatus.PRINTED).length;
+
+        this.stats = { total, delivered, pending, printed };
+      },
+      error: (err) => {
+        console.error('Error fetching attestations', err);
+      }
+    });
   }
 
   getPercentage(value: number, total: number): number {
@@ -52,11 +63,9 @@ export class AdminDashboardHomeComponent implements OnInit {
   refreshData(): void {
     this.loadAttestationData();
   }
-  ////////////////////////////////
 
-  executions: Execution[] = [];
   loadExecutions(): void {
-    // Mock data - replace with HTTP call later
+    // TODO: Replace this mock data with API call when backend endpoint is ready
     this.executions = [
       {
         id: '1',
@@ -73,28 +82,12 @@ export class AdminDashboardHomeComponent implements OnInit {
         workflowId: 'wf_002',
         startedAt: new Date(Date.now() - 120000),
         stoppedAt: new Date()
-      },
-      {
-        id: '3',
-        status: 'waiting',
-        workflowName: 'Generate Report',
-        workflowId: 'wf_002',
-        startedAt: new Date(Date.now() - 120000),
-        stoppedAt: new Date()
-      },
-      {
-        id: '5',
-        status: 'running',
-        workflowName: 'Generate Report',
-        workflowId: 'wf_002',
-        startedAt: new Date(Date.now() - 120000),
-        stoppedAt: new Date()
       }
     ];
   }
 
   refreshExecutions(): void {
-    this.loadExecutions(); // Re-trigger mock data load
+    this.loadExecutions();
   }
 
   trackByExecutionId(index: number, execution: Execution): string {
@@ -120,7 +113,5 @@ export class AdminDashboardHomeComponent implements OnInit {
 
   viewExecutionDetails(execution: Execution): void {
     console.log('Viewing details for execution:', execution);
-    // Placeholder for navigation or modal logic
   }
-
 }

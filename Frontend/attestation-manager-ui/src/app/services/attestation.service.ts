@@ -8,7 +8,7 @@ import { Attestation, AttestationStatus } from '../admin-dashboard/attestation-m
 })
 export class AttestationService {
 
-  private baseUrl = 'http://localhost:9090/attestations';
+  private baseUrl = 'http://localhost:9090/api/attestations';
 
   constructor(private http: HttpClient) { }
 

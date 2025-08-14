@@ -29,9 +29,9 @@
         </div>
       </div>
 
-      <div class="stat-card failed">
-        <div class="stat-header">FAILED</div>
-        <div class="stat-value">{{ stats.failed }}</div>
+      <div class="stat-card printed">
+        <div class="stat-header">PRINTED</div>
+        <div class="stat-value">{{ stats.printed }}</div>
         <div class="stat-change negative">
           <i class="bi bi-arrow-down"></i> 1% from last week
         </div>
@@ -66,11 +66,11 @@
         
         <div class="status-bar">
           <div class="status-info">
-            <span class="status-name">Failed</span>
-            <span class="status-count">{{ stats.failed }} ({{ getPercentage(stats.failed, stats.total) }}%)</span>
+            <span class="status-name">Printed</span>
+            <span class="status-count">{{ stats.printed }} ({{ getPercentage(stats.printed, stats.total) }}%)</span>
           </div>
           <div class="status-bar-track">
-            <div class="status-bar-fill failed" [style.width.%]="getPercentage(stats.failed, stats.total)"></div>
+            <div class="status-bar-fill printed" [style.width.%]="getPercentage(stats.printed, stats.total)"></div>
           </div>
         </div>
       </div>
