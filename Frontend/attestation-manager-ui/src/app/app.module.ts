@@ -22,6 +22,8 @@ import { AttestationsComponent } from './admin-dashboard/attestation-management/
 import { ListStudentsComponent } from './admin-dashboard/attestation-management/list-students/list-students.component';
 import { CreateStudentsComponent } from './admin-dashboard/attestation-management/create-students/create-students.component';
 import { AuthInterceptor } from './services/Interceptors/auth.interceptor';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NotificationComponent } from './notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +43,7 @@ import { AuthInterceptor } from './services/Interceptors/auth.interceptor';
     AttestationsComponent,
     ListStudentsComponent,
     CreateStudentsComponent,
+    NotificationComponent,
   ],
   imports: [
     BrowserModule,
@@ -48,7 +51,8 @@ import { AuthInterceptor } from './services/Interceptors/auth.interceptor';
     ReactiveFormsModule,
     HttpClientModule,
     NgChartsModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule
   ],
   providers: [
       {

@@ -15,22 +15,20 @@
         <table class="table table-hover executions-table mb-0">
           <thead class="table-header">
             <tr>
-              <th style="width: 8%">ID</th>
+              <th style="width: 12.5%">Student ID</th>
               <th style="width: 20%">Name</th>
               <th style="width: 25%">Email</th>
               <th style="width: 12.5%">Class</th>
-              <th style="width: 12.5%">Student ID</th>
               <th style="width: 10%">Attestations</th>
               <th style="width: 12%" class="text-end">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let student of filteredStudents">
-              <td>{{ student.id }}</td>
+              <td>{{ student.studentId }}</td>
               <td class="text-truncate" [title]="student.fullName">{{ student.fullName }}</td>
               <td class="text-truncate" [title]="student.email">{{ student.email }}</td>
               <td class="text-truncate" [title]="student.studentClass">{{ student.studentClass }}</td>
-              <td>{{ student.studentId }}</td>
               <td>
                 <span [ngClass]="{
                   'attestation-badge': true,

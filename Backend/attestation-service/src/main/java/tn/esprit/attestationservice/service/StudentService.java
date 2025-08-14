@@ -17,9 +17,14 @@ public class StudentService implements IStudentService {
 
     @Override
     public Student addStudent(Student student) {
+        student.setAttestationsCount(0);
         return studentRepository.save(student);
     }
-
+    @Override
+    public List<Student> addStudents(List<Student> students) {
+        students.forEach(s -> s.setAttestationsCount(0));
+        return studentRepository.saveAll(students);
+    }
     @Override
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
