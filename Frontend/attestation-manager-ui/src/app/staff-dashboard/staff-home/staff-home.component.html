@@ -1,0 +1,101 @@
+<div class="manage-attestations-wrapper">
+  <div class="manage-attestations-main-content">
+    <div class="content-card">
+      <!-- Header with title, search, and class filter -->
+      <div class="executions-header">
+        <div class="header-left">
+          <h2 class="card-title">Attestations</h2>
+        </div>
+        <div class="header-right">
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="🔍 Search by name or ID"
+            [(ngModel)]="searchTerm"
+          />
+          <select class="form-control class-select" [(ngModel)]="selectedClass">
+            <option *ngFor="let cls of classOptions" [value]="cls">{{ cls }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="loading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading attestations...</p>
+      </div>
+
+      <!-- Error message -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Table -->
+      <div class="table-scroll-container" *ngIf="!loading && !errorMessage">
+        <table class="table table-hover executions-table mb-0">
+          <thead class="table-header">
+            <tr>
+              <th>Ref Code</th>
+              <th>Student Name</th>
+              <th>Student ID</th>
+              <th>Student Class</th>
+              <th>Status</th>
+              <th>Request Date</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let attestation of filteredAttestations">
+              <td>{{ attestation.refCode }}</td>
+              <td>{{ attestation.student.fullName }}</td>
+              <td>{{ attestation.student.studentId }}</td>
+              <td>{{ attestation.student.studentClass }}</td>
+              <td>
+                <span [ngClass]="{
+                  'status-badge': true,
+                  'status-delivered': attestation.status === AttestationStatus.DELIVERED,
+                  'status-pending': attestation.status === AttestationStatus.PENDING,
+                  'status-printed': attestation.status === AttestationStatus.PRINTED
+                }">
+                  {{ attestation.status }}
+                </span>
+              </td>
+              <td>{{ attestation.requestDate }}</td>
+              <td class="text-end actions-cell">
+                <button
+                  class="action-btn view-btn"
+                  title="View Attestation"
+                  (click)="onView(attestation)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  *ngIf="attestation.status === AttestationStatus.PENDING"
+                  class="action-btn print-btn"
+                  title="Print Attestation"
+                  (click)="onPrint(attestation)"
+                >
+                  <i class="bi bi-printer"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && !errorMessage && filteredAttestations.length === 0" class="empty-state">
+        <div class="empty-state-icon">
+          <i class="bi bi-search"></i>
+        </div>
+        <div class="empty-state-text">
+          <h4>No attestations found</h4>
+          <p>Try a different search term or check back later.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

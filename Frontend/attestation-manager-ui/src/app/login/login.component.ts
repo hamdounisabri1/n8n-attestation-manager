@@ -42,7 +42,7 @@ export class LoginComponent {
         if (role === 'ADMIN') {
           this.router.navigate(['/admin']);
         } else if (role === 'STAFF') {
-          this.router.navigate(['/staff']);
+          this.router.navigate(['/staff/home']);
         } else {
           this.router.navigate(['/login']); // fallback
         }

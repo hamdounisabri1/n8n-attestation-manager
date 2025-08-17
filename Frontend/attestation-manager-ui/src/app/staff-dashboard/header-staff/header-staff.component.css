@@ -1,0 +1,137 @@
+.admin-header {
+  background: #fef9f9;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0px 0.5px 0 #e6cccc;
+  border: 1px solid #f4e3e3;
+  border-top: none;
+  width: 100vw; /* Full viewport width */
+  min-width: 800px;
+  font-family: inherit;
+  margin: 0;
+  margin-left: calc(-50vw + 50%); /* Break out of parent container */
+  margin-right: calc(-50vw + 50%);
+  padding: 0.75rem 1.5rem 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.admin-header__top {
+  display: none; /* Hide the top section since we're flattening */
+}
+
+/* Logo Styles */
+.logo {
+  display: flex;
+  align-items: center;
+  height: 60px;
+}
+.logo img {
+  height: 55px;
+  width: auto;
+  display: block;
+}
+
+.admin-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-header__icon {
+  color: #2d1414;
+  font-size: 1.1rem;
+  vertical-align: middle;
+}
+
+.admin-header__title {
+  color: #1a0707;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.admin-header__nav {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  flex-shrink: 0; /* Don't shrink the nav section */
+}
+
+.admin-header__nav-item {
+  color: #2d1414;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.7rem;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.admin-header__nav-item:hover {
+  background: #f6e3e3;
+}
+.admin-header__nav-item.active {
+  font-weight: 600;
+  color: #b33a3a;
+}
+
+.admin-header__logout-btn {
+  background: #d11a1a;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  box-shadow: 0 1px 2px #e6cccc40;
+  transition: background 0.2s;
+  white-space: nowrap; /* Prevent text wrapping */
+  flex-shrink: 0; /* Don't shrink the button */
+}
+.admin-header__logout-btn:hover {
+  background: #c20000;
+}
+
+.admin-header__tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  flex-grow: 1; /* Take up remaining space */
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.admin-header__tab {
+  position: relative;
+  font-weight: 600;
+  font-size: 1.04rem;
+  color: #b33a3a;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem 0.5rem 0.4rem;
+  transition: color 0.15s, opacity 0.1s;
+  text-decoration: none; /* Remove underline from links */
+}
+
+.admin-header__tab:hover {
+  text-decoration: none; /* Ensure no underline on hover */
+}
+
+.admin-header__tab.active {
+  color: #1a0707;
+  opacity: 1;
+}
+.admin-header__tab.active::after {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  margin-top: 5px;
+  width: 90%;
+  height: 3px;
+  background: #c20000;
+  border-radius: 2px;
+}

@@ -1,6 +1,4 @@
-    <div class="admin-container">
-      <nav class="admin-nav">
-        <button class="logout-btn" (click)="logout()">Logout</button>
-      </nav>
-      <button (click)="showMessage()">Show Notification</button>
-    </div>
+<app-header-staff></app-header-staff>
+<div class="admin-dashboard-content">
+  <router-outlet></router-outlet>
+</div>

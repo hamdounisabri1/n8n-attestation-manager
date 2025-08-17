@@ -14,6 +14,8 @@ import { PasswordResetRequestComponent } from './admin-dashboard/user-management
 import { AttestationsComponent } from './admin-dashboard/attestation-management/attestations/attestations.component';
 import { ListStudentsComponent } from './admin-dashboard/attestation-management/list-students/list-students.component';
 import { CreateStudentsComponent } from './admin-dashboard/attestation-management/create-students/create-students.component';
+import { StaffHomeComponent } from './staff-dashboard/staff-home/staff-home.component';
+import { DeliveryManagementComponent } from './staff-dashboard/delivery-management/delivery-management.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -55,7 +57,18 @@ const routes: Routes = [
   {
     path: 'staff',
     component: StaffDashboardComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+       {
+        path: 'home',
+        component: StaffHomeComponent 
+       },
+        {
+        path: 'deliveries',
+        component: DeliveryManagementComponent 
+       }
+
+    ]
   }
 ];
 

@@ -24,6 +24,9 @@ import { CreateStudentsComponent } from './admin-dashboard/attestation-managemen
 import { AuthInterceptor } from './services/Interceptors/auth.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NotificationComponent } from './notification/notification.component';
+import { HeaderStaffComponent } from './staff-dashboard/header-staff/header-staff.component';
+import { StaffHomeComponent } from './staff-dashboard/staff-home/staff-home.component';
+import { DeliveryManagementComponent } from './staff-dashboard/delivery-management/delivery-management.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +47,9 @@ import { NotificationComponent } from './notification/notification.component';
     ListStudentsComponent,
     CreateStudentsComponent,
     NotificationComponent,
+    HeaderStaffComponent,
+    StaffHomeComponent,
+    DeliveryManagementComponent,
   ],
   imports: [
     BrowserModule,
