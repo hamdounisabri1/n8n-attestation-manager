@@ -2,6 +2,7 @@ package tn.esprit.attestationservice.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.attestationservice.entity.Student;
 import tn.esprit.attestationservice.service.IStudentService;
@@ -41,5 +42,11 @@ public class StudentController {
     @DeleteMapping("/delete/{id}")
     public String deleteStudent(@PathVariable Long id) {
         return studentService.deleteStudent(id);
+    }
+
+    @GetMapping("/by-student-id/{studentId}")
+    public ResponseEntity<Long> getStudentDatabaseId(@PathVariable String studentId) {
+        Long dbId = studentService.getStudentIDByStudentID(studentId);
+        return ResponseEntity.ok(dbId);
     }
 }

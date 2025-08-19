@@ -25,6 +25,16 @@ public class StudentService implements IStudentService {
         students.forEach(s -> s.setAttestationsCount(0));
         return studentRepository.saveAll(students);
     }
+
+    public Long getStudentIDByStudentID(String studentId) {
+        Student student = studentRepository.findByStudentId(studentId);
+        if (student == null) {
+            return 0L; // Student not found
+        }
+        return student.getId();
+    }
+
+
     @Override
     public List<Student> getAllStudents() {
         return studentRepository.findAll();

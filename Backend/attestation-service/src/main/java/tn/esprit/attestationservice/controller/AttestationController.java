@@ -30,13 +30,13 @@ public class AttestationController {
     }
 
     @PostMapping("/create")
-    public Attestation create(@RequestBody Attestation attestation) {
-        return attestationService.createAttestation(attestation);
+    public Attestation create() {
+        return attestationService.createAttestation();
     }
 
     @PostMapping("/create/student/{studentId}")
-    public Attestation createForStudent(@PathVariable Long studentId, @RequestBody Attestation attestation) {
-        return attestationService.createAttestationForStudent(studentId, attestation);
+    public Attestation createForStudent(@PathVariable Long studentId) {
+        return attestationService.createAttestationForStudent(studentId);
     }
 
     @PatchMapping("/{id}/status")
@@ -56,5 +56,7 @@ public class AttestationController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         }
     }
+
+
 
 }

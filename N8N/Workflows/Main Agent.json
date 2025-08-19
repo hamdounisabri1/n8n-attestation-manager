@@ -1,0 +1,405 @@
+{
+  "name": "Main Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        580,
+        -180
+      ],
+      "id": "75bcfd6c-cfce-4e6c-bc09-d5a584cf2085",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9ByuDGrVsn9tB1l9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below is the email:\nSubject:  \n{{ $json.Subject }}\nFrom:  \n{{ $json.From }}\nBody:  \n{{ $json.body }}\n\n \n\n",
+        "options": {
+          "systemMessage": "=ROLE  \nYou are a professional assistant specialized in managing student email requests for attestations de présence.\n\nCONTEXT  \nYou receive emails from students requesting attestations de présence. Each request may be complete or incomplete.\n\nSCENARIOS / TASKS  \n\n- Scenario 1 (Complete Request):  \n  If the email contains **all required information**:  \n  - Full Name (e.g., Hamdouni Sabri)  \n  - Student ID matching pattern like \"233AMT0415\"  \n  - Current Class formatted as: digit 1-5 + \"A\", \"B\" or \"ARCTIC\" + number 1-100 (e.g., \"4 ARCTIC 11\") \n\n1.Verify the student exists using the HTTP_Request_GET_student_ID tool. This will return the student ID in the format:\n{\n  \"response\": [28]\n}\n\n2.If the returned student ID is different from 0, use the HTTP_Request_Create_Attestation tool to create the attestation in the database. Set the URL dynamically using the student ID returned by the first tool, you will set the URL on the tool base on the description.\n\n3.After successfully creating the attestation, use the send_confirmation_email tool to send a confirmation email to the student\n\n\n\n- Scenario 2 (Incomplete Request):  \n  If **any** required information is missing, you **must use the tool named**:  \n  `request_missing_info_email`  \n  And specify exactly which information is missing.\n\n###TOOLS###\n-HTTP_Request_GET_student_ID: Use this tool immediately after verifying that the email is a valid attestation request and contains all required information. It retrieves the student ID from the database. This is the first tool to use in the workflow for complete requests.\n-HTTP_Request_Create_Attestation: Use this tool only if the student ID returned by HTTP_Request_GET_student_ID is different from 0. It creates the attestation in the database. This tool should be used after HTTP_Request_GET_student_ID in the workflow.\n-send_confirmation_email: Use this tool after successfully creating the attestation with HTTP_Request_Create_Attestation. It sends a professional confirmation email to the student with all relevant attestation details.\n-request_missing_info_email: Use this tool when any required information is missing from the email. Specify exactly which details are missing in the message to the student.\n\n###TOOLS USAGE ORDER###\n##When the request is complete, always use the tools in this sequence:##\nHTTP_Request_GET_student_ID – to retrieve the student ID from the database.\nHTTP_Request_Create_Attestation – to create the attestation for the verified student.\nsend_confirmation_email – to notify the student that the attestation was successfully created.\n\n##When the request is incomplete, immediately use:##\n\nrequest_missing_info_email – to notify the student of missing information.\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -180
+      ],
+      "id": "d7e1651d-b329-40ed-8440-13f3c6ef3be1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        980,
+        80
+      ],
+      "id": "b257fdaa-f022-43a7-86fd-0d97593d1039",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5QSX88wiQ7mKzVBx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb9950fc-9d32-4297-9234-e1b75d2e0ad4",
+              "name": "Subject",
+              "value": "={{ $json.headers.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "c81b105a-bdea-40b5-82ab-91f7a46c3f26",
+              "name": "body",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c1d1c4fd-a827-4f22-8759-2c9ba9952c85",
+              "name": "From",
+              "value": "={{ $json.from.value[0].address }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        820,
+        -180
+      ],
+      "id": "760661bf-926e-464d-a0d9-2227cf1b6d29",
+      "name": "Extract email inforamtions"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Sends an email requesting missing information (Full Name, Student ID, or Current Class) from the student if any required field is missing.",
+        "sendTo": "={{ $json.From }}",
+        "subject": "Response",
+        "message": "=<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Informations Manquantes - Attestation de Présence</title>\n  <style>\n    body {\n      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n      background-color: #f7f9fc;\n      color: #333;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 30px;\n      max-width: 600px;\n      margin: auto;\n      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);\n    }\n    .header {\n      text-align: center;\n      color: #e67e22;\n    }\n    .highlight {\n      color: #c0392b;\n      font-weight: bold;\n    }\n    .footer {\n      margin-top: 30px;\n      font-size: 0.9em;\n      color: #888;\n      text-align: center;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2 class=\"header\">⚠️ Informations Manquantes</h2>\n    <p>Bonjour <span class=\"highlight\">{{$fromAI(\"studentName\",\"the student name thats send the email\",\"String\")}}</span>,</p>\n    <p>\n      Nous avons bien reçu votre demande d'<strong>attestation de présence</strong>.\n    </p>\n    <p>\n      Cependant, votre message ne contient pas toutes les informations nécessaires au traitement de votre demande.\n    </p>\n    <p>\n      Merci de bien vouloir <strong>renvoyer un nouvel e-mail</strong> contenant toutes les informations requises.\n    </p>\n    <p>\n      Cordialement,<br>\n      L'équipe <span class=\"highlight\">ESPRIT</span>.\n    </p>\n    <div class=\"footer\">\n      Ne répondez pas à cet e-mail. Pour toute autre demande, veuillez contacter le service scolarité.\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1300,
+        80
+      ],
+      "id": "1e11ec58-9cfb-406d-95e9-4c8d8f3d6f73",
+      "name": "request_missing_info_email",
+      "webhookId": "dda97c32-e931-4bc5-83a6-b28ac6c36aa3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9ByuDGrVsn9tB1l9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": " Sends a confirmation email with the attestation once all required info is provided.",
+        "sendTo": "={{ $json.From }}",
+        "subject": "=Response",
+        "message": "=<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Attestation de Présence</title>\n  <style>\n    body {\n      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n      background-color: #f7f9fc;\n      color: #333;\n      padding: 20px;\n    }\n    .container {\n      background-color: #ffffff;\n      border-radius: 10px;\n      padding: 30px;\n      max-width: 600px;\n      margin: auto;\n      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);\n    }\n    .header {\n      text-align: center;\n      color: #2c3e50;\n    }\n    .highlight {\n      color: #2980b9;\n      font-weight: bold;\n    }\n    .footer {\n      margin-top: 30px;\n      font-size: 0.9em;\n      color: #888;\n      text-align: center;\n    }\n    .code-box {\n      margin: 20px 0;\n      padding: 12px;\n      background-color: #ecf3fc;\n      border-left: 4px solid #2980b9;\n      font-family: 'Courier New', Courier, monospace;\n      font-size: 1.1em;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2 class=\"header\">🎓 Attestation de Présence</h2>\n    <p>Bonjour <span class=\"highlight\"> {{$fromAI(\"studentName\",\"the student name thats send the email\",\"String\")}} </span>,</p>\n    <p>\n      Nous avons bien traité votre demande d'<strong>attestation de présence</strong>.\n    </p>\n    <p>\n      📄 <strong>Votre attestation est prête</strong> et vous la recevrez dans les <span class=\"highlight\">24 prochaines heures</span>.\n    </p>\n    <div class=\"code-box\">\n      🔑 <strong>Code de référence :</strong> \"1\"\n    </div>\n    <p>\n      Merci de votre confiance.<br>\n      L'équipe <span class=\"highlight\">ESPRIT</span>.\n    </p>\n    <div class=\"footer\">\n      Ne répondez pas à cet e-mail. Pour toute autre demande, veuillez contacter le service scolarité.\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1640,
+        80
+      ],
+      "id": "ce035960-eb62-4477-95d3-bf20e5c71939",
+      "name": "send_confirmation_email",
+      "webhookId": "19f7f802-41d4-4875-9bd7-a1eb6f725fad",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9ByuDGrVsn9tB1l9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.From }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1140,
+        80
+      ],
+      "id": "aa0b32ce-2942-47fd-8b7f-b5d77b1c8078",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "USE THIS TOOL TO CREATE AN ATTESTAION",
+        "method": "POST",
+        "url": "={{ $fromAI('URL', `http://192.168.60.232:9090/api/attestations/create/student/${$json[\"HTTP_Request_GET_student_ID\"]}`, 'string') }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        2020,
+        80
+      ],
+      "id": "8ab8f617-8f7d-47fe-8b5e-c6b4a30f17b3",
+      "name": "HTTP_Request_Create_Attestation"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.From }}",
+        "subject": "test",
+        "message": "=<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Attestation – Étudiant introuvable</title>\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <style>\n    body {\n      margin: 0; padding: 20px; background-color: #f7f9fc; color: #333;\n      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    }\n    .container {\n      background-color: #ffffff; border-radius: 10px; padding: 30px;\n      max-width: 600px; margin: auto;\n      box-shadow: 0 4px 12px rgba(0,0,0,0.08);\n    }\n    .header { text-align: center; color: #2c3e50; }\n    .highlight { color: #2980b9; font-weight: bold; }\n    .footer {\n      margin-top: 30px; font-size: 0.9em; color: #888; text-align: center;\n    }\n    .alert-box {\n      margin: 20px 0; padding: 12px;\n      background-color: #fdecea; border-left: 4px solid #e74c3c;\n      font-family: 'Courier New', Courier, monospace; font-size: 1.05em;\n      color: #c0392b;\n    }\n    .info-list {\n      margin: 16px 0; padding-left: 18px;\n    }\n    .btn {\n      display: inline-block; margin-top: 14px; padding: 10px 16px;\n      background-color: #2980b9; color: #fff; text-decoration: none;\n      border-radius: 6px; font-weight: 600;\n    }\n    .meta {\n      margin-top: 10px; font-size: 0.95em; color: #555;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <h2 class=\"header\">🎓 Attestation de Présence</h2>\n\n    <p>Bonjour <span class=\"highlight\">//Nom Étudiant//</span>,</p>\n\n    <p>\n      Nous avons bien reçu votre demande d’<strong>attestation de présence</strong>.\n      Après vérification, nous n’avons <strong>pas trouvé d’enregistrement correspondant</strong> à vos informations\n      dans notre système.\n    </p>\n\n    <div class=\"alert-box\">\n      ❗ <strong>Étudiant introuvable</strong><br>\n      Merci de vérifier vos informations et de réessayer.\n    </div>\n\n\n    <p>Pour nous aider à traiter votre demande, veuillez :</p>\n    <ul class=\"info-list\">\n      <li>Confirmer l’<strong>orthographe complète du nom et prénom</strong>.</li>\n      <li>Vérifier votre <strong>identifiant étudiant</strong> et votre <strong>classe</strong>.</li>\n      <li>Joindre, si possible, un justificatif (ex. carte étudiant).</li>\n    </ul>\n\n    <p>\n      Vous pouvez <strong>soumettre à nouveau</strong> votre demande avec les informations corrigées\n      ou contacter le service scolarité pour assistance.\n    </p>\n\n \n\n    <p>\n      Merci de votre compréhension.<br>\n      L’équipe <span class=\"highlight\">ESPRIT</span>.\n    </p>\n\n    <div class=\"footer\">\n      Ne répondez pas à cet e-mail. Pour toute autre demande, veuillez contacter le service scolarité.\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1460,
+        80
+      ],
+      "id": "9d174264-82e1-4730-817a-17a9b41204e3",
+      "name": "Send_NotFound_Student_Email",
+      "webhookId": "93a8cadb-1a34-4afc-bfc7-f907f03311a6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9ByuDGrVsn9tB1l9",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to fetch studentID from data base from the student identifiant",
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', `   replace with this url http://192.168.60.232:9090/api/students/by-student-id/{studentid}\nyou will replace the {studentid} from the studentID from the USER INPUT (Student ID matching pattern like \"233AMT0415\") `, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        80
+      ],
+      "id": "3ffe3765-ead0-44e9-b145-199f9ab71d1d",
+      "name": "HTTP_Request_GET_student_ID"
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "198bc97ad4a144ee",
+          "threadId": "198bc97ad4a144ee",
+          "labelIds": [
+            "IMPORTANT",
+            "CATEGORY_PERSONAL",
+            "INBOX"
+          ],
+          "sizeEstimate": 6612,
+          "headers": {
+            "delivered-to": "Delivered-To: sabrihamdouni7@gmail.com",
+            "received": "Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])\r\n        by mx.google.com with SMTPS id a640c23a62f3a-afcdd0495cdsor289917966b.9.2025.08.18.02.51.53\r\n        for <sabrihamdouni7@gmail.com>\r\n        (Google Transport Security);\r\n        Mon, 18 Aug 2025 02:51:53 -0700 (PDT)",
+            "x-received": "X-Received: by 2002:a17:907:9410:b0:af6:341a:5ec4 with SMTP id\r\n a640c23a62f3a-afcdc1f91c7mr1039001566b.16.1755510712624; Mon, 18 Aug 2025\r\n 02:51:52 -0700 (PDT)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1755510713; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=HqEYrsiAiQPHUsy9CWAFzFFpRq+Z4+TKoylLkRf7lAOf7gf7PQxhYpUeUc7J9UF0Mb\r\n         NBsavHrssqhu8fWazbih4vZ25wVJ/zeKfdYxeKVPOHQY8Vf8A3G4aiWTJrgZfZwFXnem\r\n         sdXEZz+Y4GWC3U2HQXk6iX1RGJk/Vy3/iOxDltO3cH5Vlg7doNJaEG37Zc68NgJobm31\r\n         IBjohwUsEJlzH5PyFMjM0145M4rOcGEaYzLNIEClkcPWO8CC2VOOyvp4+7aGz2WQj6o/\r\n         NTbhGlZydiwukWUWMd2qrJNoIA8QwadM0m80jDgSEA3yLEoFbFS8y0cxyeTWndg/moi0\r\n         UtJg==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:subject:message-id:date:from:mime-version:dkim-signature;\r\n        bh=SOpYxn5MkhEggXZYHXhuZwyv4BBlzaIP/7KHT0gfJyo=;\r\n        fh=ymFgsOzRlF9flyG6KVlYSRDxsWlTxWYNkmxs1bZWgaY=;\r\n        b=OrcXRAGNRuxLpkKhj9WrwX45XDzw6ZMRCyG+G1kayXWhEmrXbe8QY1LuegKv0jzki/\r\n         5QsRyAciXnJfHnUAy5ZeM+HIFzWKGUWE2aYsukytYyhH/4W4Ia7hlNQWmvUuYWNMDgvJ\r\n         wUFKu3tforhGy1FagdIi11T2O8GPtLl+IpYsPpASAbpL5hYG4T+xJKQkXd2gLM3/ob4J\r\n         53MMcH6r86iuIX3NDhECMHbz64ulU++8+PjYrDqLKxuqmJSB+4ytrnbhlgFAmbRWF032\r\n         OtF3KBrspurUM2ddtIsTocf02bbv56W+flpC9tpgEaUtuB+jBVdktIqZU6pXBJdRwNik\r\n         XeyQ==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=KtBCIRuQ;\r\n       spf=pass (google.com: domain of hamdounisabri2@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=hamdounisabri2@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "return-path": "Return-Path: <hamdounisabri2@gmail.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of hamdounisabri2@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@gmail.com header.s=20230601 header.b=KtBCIRuQ;\r\n       spf=pass (google.com: domain of hamdounisabri2@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=hamdounisabri2@gmail.com;\r\n       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=gmail.com; s=20230601; t=1755510713; x=1756115513; dara=google.com;\r\n        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject\r\n         :date:message-id:reply-to;\r\n        bh=SOpYxn5MkhEggXZYHXhuZwyv4BBlzaIP/7KHT0gfJyo=;\r\n        b=KtBCIRuQU8EzG5yMnD8zBU9mvGo44896kHDxs6Axn0VF9wljXKKYnp6spfOyUFfaiy\r\n         sP+iq/uTkk7GPmgUtI5AVtPBiE/f47TcByqFcT7p10BbTvLSzCdh1cUF1/1lZx0wrnzA\r\n         MT7W1nAPIeXtM5GI805FMLaQyGl2vgWVWTBIbQzf8y4HJIta3WTStuxQUB3GwfQu8nOV\r\n         NasZ1pAjItfX7OX3ZmtIOa9NxJsRIr8+ZiVNE1JRjKm42boBzPEhDqhVoXGruvAIJRC1\r\n         n4WCAKydFCJ/v/aW6R33garz/zpATCA73YLofdX6w6a3CnHeirq5WtQuvMBSW/UMBZt+\r\n         7Hwg==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1755510713; x=1756115513;\r\n        h=to:subject:message-id:date:from:mime-version:x-gm-message-state\r\n         :from:to:cc:subject:date:message-id:reply-to;\r\n        bh=SOpYxn5MkhEggXZYHXhuZwyv4BBlzaIP/7KHT0gfJyo=;\r\n        b=G0q2v6L7jKiOEsOPzZUfVoHExe9M9DF843BzRf4GrqvDA2kraWKF9GtS3KYoLPRFiy\r\n         kvOUq4+z83Zto5wDB1hY7Qc1qgmNjry4hLng0v7RkLPEPokRM8DU74OFY+MXdzP10Mu/\r\n         j1HbAMDOVtBG9idk948ZVnXUrnTzUKsfhUUbKe3jylvYFSpEWSuugcfkuB6SfWqHN2eG\r\n         P3YuuyPeYGVoxvMj+dFdfZTUkFAN448GfNloYq7FA38NYZl4nSxXgG9CPa9tx28WsU/r\r\n         rK+fik2Ue8LALn50rp4t13QoLiU3NcoKuar7qeyV7TutbKRWJjMx9s823KAUCiAzQPEc\r\n         Weqg==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0YxZzDUbq8bBlwEgXANlCtHm1QcTPffi7eD7j9Etq10ipDJItGrB\r\n\twby7ZeUe3GjA7ieiZAejjOlHUISDYjqhr4gvSEgpYq71bqE138/hMVFZKry2DeUQwMMzfPYZCR5\r\n\t3++QJXcxFSN2Z5HF7fLheTGB/UjWLJw90dT38Si4=",
+            "x-gm-gg": "X-Gm-Gg: ASbGncsTU+F8i1H+UHs5fQGiCWUlUHPrXL4lhXyJqKiVQKEt5F+KWtK+hj85elGxgQK\r\n\tehnEoxpf4/jXxQbMCKoXBbCyry+u1+Rcz7679W3tVT+0gays9KUwdUJApldCB9Ag3QUrcspO2g+\r\n\tjNsaUvyqFu9yAmoDpqbOydqgni+8AwnlIfdL6tzuErTvtt9iaAniWMmvfKC3QnZaeTeENyERobI\r\n\tl+dwIVb",
+            "x-google-smtp-source": "X-Google-Smtp-Source: AGHT+IGOH/S/HXY3O7pmVZt05ZlS73oLy15eQ/4JJheIkpLrHXh49JgIb62Hr3ZBCq1yE5BNgbz7ybRIBmfJk8Gzl9o=",
+            "mime-version": "MIME-Version: 1.0",
+            "from": "From: Sabri Hamdouni <hamdounisabri2@gmail.com>",
+            "date": "Date: Mon, 18 Aug 2025 10:51:42 +0100",
+            "x-gm-features": "X-Gm-Features: Ac12FXy_skwmsl-ADacdulrj-3VKOM33MFMOLTp-VfMVPFWj0WzrpTRd28R-NCs",
+            "message-id": "Message-ID: <CADPT7S7bGbeXcsprod0wOs2stQmO-Re3hqNvZXA-E4QH-70KoQ@mail.gmail.com>",
+            "subject": "Subject: =?UTF-8?Q?demande_de_attestation_de_pr=C3=A9sence=2E?=",
+            "to": "To: sabrihamdouni7@gmail.com",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"0000000000006ced79063ca0b0ce\""
+          },
+          "html": "<div dir=\"ltr\"><br>Chère équipe d&#39;ESPRIT,<br>J&#39;espère que ce message vous trouve en bonne santé. Je me permets de vous écrire afin de solliciter une attestation de présence.<br>Vous trouverez ci-dessous les informations nécessaires au traitement de ma demande: <br><br>Nom et prénom : Hamdouni Sabri <br>Matricule étudiant: 233AMT0415 <br>Classe actuelle: 4 ARCTIC 11<br><br>Cordialement, <br>Hamdouni Sabri<br></div>\n",
+          "text": "Chère équipe d'ESPRIT,\nJ'espère que ce message vous trouve en bonne santé. Je me permets de vous\nécrire afin de solliciter une attestation de présence.\nVous trouverez ci-dessous les informations nécessaires au traitement de ma\ndemande:\n\nNom et prénom : Hamdouni Sabri\nMatricule étudiant: 233AMT0415\nClasse actuelle: 4 ARCTIC 11\n\nCordialement,\nHamdouni Sabri\n",
+          "textAsHtml": "<p>Ch&egrave;re &eacute;quipe d&apos;ESPRIT,<br/>J&apos;esp&egrave;re que ce message vous trouve en bonne sant&eacute;. Je me permets de vous<br/>&eacute;crire afin de solliciter une attestation de pr&eacute;sence.<br/>Vous trouverez ci-dessous les informations n&eacute;cessaires au traitement de ma<br/>demande:</p><p>Nom et pr&eacute;nom : Hamdouni Sabri<br/>Matricule &eacute;tudiant: 233AMT0415<br/>Classe actuelle: 4 ARCTIC 11</p><p>Cordialement,<br/>Hamdouni Sabri</p>",
+          "subject": "demande de attestation de présence.",
+          "date": "2025-08-18T09:51:42.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "sabrihamdouni7@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:sabrihamdouni7@gmail.com\" class=\"mp_address_email\">sabrihamdouni7@gmail.com</a></span>",
+            "text": "sabrihamdouni7@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "hamdounisabri2@gmail.com",
+                "name": "Sabri Hamdouni"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Sabri Hamdouni</span> &lt;<a href=\"mailto:hamdounisabri2@gmail.com\" class=\"mp_address_email\">hamdounisabri2@gmail.com</a>&gt;</span>",
+            "text": "\"Sabri Hamdouni\" <hamdounisabri2@gmail.com>"
+          },
+          "messageId": "<CADPT7S7bGbeXcsprod0wOs2stQmO-Re3hqNvZXA-E4QH-70KoQ@mail.gmail.com>"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract email inforamtions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract email inforamtions": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "request_missing_info_email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send_confirmation_email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_Request_Create_Attestation": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send_NotFound_Student_Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_Request_GET_student_ID": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6e968216-012c-45b3-b63f-48ae2f2f781e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb4c5d6c74c36d6ed9106737ec856f2c4a1ec8175f95a7825ad6605686bef741"
+  },
+  "id": "qiXTN0eZOF6EXYGa",
+  "tags": []
+}

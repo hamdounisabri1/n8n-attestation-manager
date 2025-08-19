@@ -55,6 +55,8 @@ markAsDelivered(refCode: string) {
       next: (updatedAttestation) => {
         // Update the local attestation object so UI reflects the change
         attestation.status = updatedAttestation.status;
+        this.loadPendingAttestations();
+        
         this.notificationService.show(`Attestation with RefCode ${refCode} marked as delivered.`, 'success');
       },
       error: (err) => {

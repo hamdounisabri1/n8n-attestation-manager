@@ -10,11 +10,12 @@ public interface IAttestationService {
 
     Attestation getAttestationById(Long id);
 
-    Attestation createAttestation(Attestation attestation);
+    Attestation createAttestation();
 
-    Attestation createAttestationForStudent(Long studentId, Attestation attestation);
+    Attestation createAttestationForStudent(Long studentId);
 
     Attestation updateStatus(Long id, AttestationStatus status);
 
     String deleteAttestation(Long id);
+
 }

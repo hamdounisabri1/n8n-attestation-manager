@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_SECURE_COOKIE=false
+      - WEBHOOK_URL=https://eabb4e3bae4b.ngrok-free.app  # <-- add your ngrok URL here
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Student } from '../list-students/list-students.component';
 import { HttpClient } from '@angular/common/http';
+import { NotificationsService } from 'src/app/services/notifications.service';
 export interface Attestation {
   id: number;
   refCode: string;
   status : AttestationStatus;
   requestDate: string;
-  delivreDate: string;
+  deliveryDate: string;
   student : Student
 }
 export enum AttestationStatus {
@@ -26,7 +27,7 @@ export class AttestationsComponent implements OnInit {
 
   private apiUrl = 'http://localhost:9090/api/attestations/all';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private notificationService : NotificationsService ) {}
 
   ngOnInit(): void {
     this.loadAttestations();
@@ -69,11 +70,12 @@ export class AttestationsComponent implements OnInit {
         })
         .subscribe({
           next: (response) => {
-            alert(response);
+            this.notificationService.show(response, 'success');
             this.loadAttestations(); // reload after delete
           },
           error: (err) => {
             console.error('Delete failed', err);
+            this.notificationService.show('Delete failed', 'error');
           },
         });
     }

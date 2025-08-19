@@ -37,6 +37,8 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/attestations/create/student/*").permitAll()
+                        .requestMatchers("/students/by-student-id/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -12,5 +12,5 @@ public interface IStudentService {
     Student updateStudent(Long id, Student student);
     String deleteStudent(Long id);
     List<Student> addStudents(List<Student> students); // Add multiple students
-
+    Long getStudentIDByStudentID(String studentId);
 }
