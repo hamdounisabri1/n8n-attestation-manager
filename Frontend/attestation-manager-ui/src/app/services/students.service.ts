@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class StudentsService {
 
   private baseUrl = 'http://localhost:9090/api/students';
-  private webhookUrl = 'https://eceb427568fb.ngrok-free.app/webhook-test/7966ea91-8964-43ee-8403-1e4596c95f61';
+  private webhookUrl = 'https://eabb4e3bae4b.ngrok-free.app/webhook-test/7966ea91-8964-43ee-8403-1e4596c95f61';
 
 
   constructor(private http: HttpClient) {}

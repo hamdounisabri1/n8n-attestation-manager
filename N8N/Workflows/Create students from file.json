@@ -1,0 +1,163 @@
+{
+  "name": "Create students from file",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "data0",
+        "options": {
+          "headerRow": false
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -140
+      ],
+      "id": "7e5a4863-4568-4d49-8c90-5254a6853ea1",
+      "name": "Extract from File",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items (Excel rows parsed by n8n)\nconst items = $input.all();\n\n// The first row contains headers\nconst headers = items[0].json.row;\n\n// Array to store the result\nconst result = [];\n\n// Loop through each row (skip the first header row)\nfor (let i = 1; i < items.length; i++) {\n  const row = items[i].json.row;\n  const obj = {};\n\n  // Map each column value to its header\n  headers.forEach((header, index) => {\n    obj[header] = row[index];\n  });\n\n  result.push(obj);\n}\n\n// Convert the result array to a pretty JSON string\nconst allData = JSON.stringify(result, null, 2);\n\n// Return the string as output\nreturn [{ json: { allData } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -140
+      ],
+      "id": "12e2a181-c817-4a86-9d3f-7f0ae4fc30e3",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.60.232:9090/api/students/createList",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Code').item.json.allData }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        -140
+      ],
+      "id": "a7945a15-54b9-4090-8654-8cabd026b976",
+      "name": "Create List of Students"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.60.232:9090/api/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"admin\",\n  \"password\": \"admin\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        -140
+      ],
+      "id": "baee2682-98da-43be-95c5-fe77829b7e41",
+      "name": "Get Admin Token"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7966ea91-8964-43ee-8403-1e4596c95f61",
+        "options": {
+          "binaryPropertyName": "data",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -140
+      ],
+      "id": "388de2d0-a440-435f-a88d-acbcb57251ae",
+      "name": "Webhook",
+      "webhookId": "7966ea91-8964-43ee-8403-1e4596c95f61"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get Admin Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create List of Students": {
+      "main": [
+        []
+      ]
+    },
+    "Get Admin Token": {
+      "main": [
+        [
+          {
+            "node": "Create List of Students",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "16ad9735-f034-44c2-832d-abb7641df36f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb4c5d6c74c36d6ed9106737ec856f2c4a1ec8175f95a7825ad6605686bef741"
+  },
+  "id": "Wzmr1vpbgCZAu1ao",
+  "tags": []
+}
